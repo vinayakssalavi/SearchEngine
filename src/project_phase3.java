@@ -28,7 +28,7 @@ public class project_phase3 {
 	public static List<TreeMap<Integer, Integer>> tempStoreList = new ArrayList<>();
 	public static int[] wordCountPerDocArr = new int[503];
 	public static List<String> keyOfOneOccurance = new ArrayList<String>();
-	public static List<Integer> interval = new ArrayList<>(Arrays.asList(10, 20, 40, 80, 100, 200, 300, 400, 500));
+	public static List<Integer> interval = new ArrayList<>(Arrays.asList(10, 20, 40, 80, 100, 200, 300, 400, 503));
 	public static float averageDoc;
 	public static int totalDoc = 503;
 	public static double k = 1;
@@ -226,6 +226,7 @@ public class project_phase3 {
 			DictionaryFileWriter.close();
 
 		} catch (Exception e) {
+			System.out.println("Exception occurred :"+e.getMessage());
 
 		}
 	}
