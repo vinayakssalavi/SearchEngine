@@ -1,7 +1,6 @@
 
 /**************************************
  * Author       : Vinayak Salavi
- * Description  : Program to parse HTMl files and extract text from the same.
  * Arguments    : two command line argments are required to pass while executing the code.
  *                  1. Path to input files
  *                  2. Destination folder path where output will be stored.
@@ -24,6 +23,7 @@ public class project_phase3 {
 	public static TreeMap<String, Integer> testMap = new TreeMap<>();
 	public static String outputRepository, inputRepository;
 	public static TreeMap<String, List<TreeMap<Integer, Integer>>> indexMap = new TreeMap<>();
+	public static TreeMap<String, TreeMap<Integer, Double>> weightIndexMap = new TreeMap<>();
 	public static TreeMap<Integer, Integer> tempStoreMap = null;
 	public static List<TreeMap<Integer, Integer>> tempStoreList = new ArrayList<>();
 	public static int[] wordCountPerDocArr = new int[503];
@@ -48,7 +48,7 @@ public class project_phase3 {
 		File[] listOfFiles = dir.listFiles();
 		// iterate over each file
 		if (listOfFiles != null) {
-			startTime = Instant.now();
+//			startTime = Instant.now();
 			for (File file : listOfFiles) {
 
 				fileCount++;
@@ -84,14 +84,14 @@ public class project_phase3 {
 
 				// get the name of file (same name is used for output file)
 				String name = file.getName().split("\\.")[0];
-				// calling function to write words in text file
-				// textFileWriter(name, list);
-				if (interval.contains(fileCount)) {
-					endTime = Instant.now();
-					System.out.println("Preprocessed File count = " + fileCount + "\t Time required = "
-							+ Duration.between(startTime, endTime).toMillis());
-					startTime = endTime;
-				}
+				
+				// commented as calulating time for varying input instead while processing
+//				if (interval.contains(fileCount)) {
+//					endTime = Instant.now();
+//					System.out.println("Preprocessed File count = " + fileCount + "\t Time required = "
+//							+ Duration.between(startTime, endTime).toMillis());
+//					startTime = endTime;
+//				}
 				// storing words and count in Treemap, which stores the keys in sorted order
 				for (String str : list) {
 					// skip words of length 1
@@ -175,21 +175,20 @@ public class project_phase3 {
 		return sum / (float) totalDoc;
 	}
 
-//TAAT Term at a Time
-//	DAAT Doc at a Time
+
 	// function calculate term weights and create dictionary and posting files
 	private static void invertedIndexProcessing() {
 		double tf, idf, weight;
-		Instant startTime, endTime;
+//		Instant startTime, endTime;
 		averageDoc = getAverageDoc();
 		int currLineNumber = 1;
 		int counter = 0;
-
+		TreeMap<Integer, Double> tempWeightIndexMap;
 		try {
 			// create files for posting and dictionary
 			FileWriter postingFileWriter = new FileWriter(outputRepository + "/output_files/posting.txt", false);
 			FileWriter DictionaryFileWriter = new FileWriter(outputRepository + "/output_files/dictionary.txt", false);
-			startTime = Instant.now();
+//			startTime = Instant.now();
 			int totalTerms = indexMap.keySet().size();
 
 			for (String key : indexMap.keySet()) {
@@ -197,7 +196,7 @@ public class project_phase3 {
 				tempStoreList = new ArrayList<>();
 				tempStoreList = indexMap.get(key);
 				int DFj = tempStoreList.size();// Df(j)no of docs containing words
-
+				tempWeightIndexMap = new TreeMap<Integer, Double>();
 				for (TreeMap<Integer, Integer> map : tempStoreList) {
 
 					int docID = map.firstKey();
@@ -209,24 +208,26 @@ public class project_phase3 {
 					// D = 503 ,
 					idf = Math.log(totalDoc / (double) DFj);
 					weight = tf * idf;
+					tempWeightIndexMap.put(docID, weight);
 					postingFileWriter.write(docID + "," + weight + "\n");
 
 				}
+				weightIndexMap.put(key, tempWeightIndexMap);
 				DictionaryFileWriter.write(key + "\n" + DFj + "\n" + currLineNumber + "\n");
 				currLineNumber += DFj;
-				if (counter % 4000 == 0 || counter == totalTerms) {
-					endTime = Instant.now();
-					System.out.println("Processed Terms = " + counter + "\t Time required = "
-							+ Duration.between(startTime, endTime).toMillis());
-					startTime = endTime;
-				}
+//				if (counter % 4000 == 0 || counter == totalTerms) {
+//					endTime = Instant.now();
+//					System.out.println("Processed Terms = " + counter + "\t Time required = "
+//							+ Duration.between(startTime, endTime).toMillis());
+//					startTime = endTime;
+//				}
 			}
 
 			postingFileWriter.close();
 			DictionaryFileWriter.close();
 
 		} catch (Exception e) {
-			System.out.println("Exception occurred :"+e.getMessage());
+			System.out.println("Exception occurred :" + e.getMessage());
 
 		}
 	}
